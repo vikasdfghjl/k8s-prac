@@ -6,15 +6,15 @@ secrets.env
 .env
 
 # Helm and Kubernetes
-k8s-prac/charts/
-k8s-prac/templates/*.tpl
-k8s-prac/.helmignore
-k8s-prac/*.tgz
+Kubernetes/k8s-prac/charts/
+Kubernetes/k8s-prac/templates/*.tpl
+Kubernetes/k8s-prac/.helmignore
+Kubernetes/k8s-prac/*.tgz
 
 # Kubernetes secrets and config
-k8s-secret.yaml
-*.secret.yaml
-*.config.yaml
+Kubernetes/k8s-secret.yaml
+Kubernetes/*.secret.yaml
+Kubernetes/*.config.yaml
 
 # Minikube and kubectl local files (if any)
 *.log
