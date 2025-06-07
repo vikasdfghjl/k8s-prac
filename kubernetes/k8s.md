@@ -134,6 +134,53 @@ echo "http://$NODE_IP`:$NODE_PORT"
 
 ---
 
+## Deploying with ArgoCD (GitOps)
+
+### 1. Install ArgoCD
+- Follow the official documentation: https://argo-cd.readthedocs.io/en/stable/getting_started/
+- This covers installation on Kubernetes, accessing the ArgoCD UI, and logging in.
+
+### 2. Using Sealed Secrets for Secure Secret Management
+- Use [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to safely store encrypted secrets in your Git repository.
+- Example: Your `my-sealed-secret.yaml` file in the `kubernetes/` directory is a SealedSecret.
+- To create a sealed secret:
+  1. Install kubeseal and the Sealed Secrets controller (see the [official docs](https://github.com/bitnami-labs/sealed-secrets#installation)).
+  2. Create a Kubernetes Secret as usual.
+  3. Run `kubeseal --format yaml < my-secret.yaml > my-sealed-secret.yaml` to generate the sealed secret.
+  4. Commit `my-sealed-secret.yaml` to your repo (never commit raw secrets).
+  5. ArgoCD will apply the SealedSecret, and the controller will decrypt it into a real Secret in your cluster.
+
+### 3. Creating an ArgoCD Application for Your Project
+- Example manifest (`kubernetes/argocd-app.yaml`):
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-prac
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/vikasdfghjl/k8s-prac
+    targetRevision: HEAD
+    path: kubernetes/k8s-prac
+    helm:
+      valueFiles:
+        - values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions: []
+```
+
+- Apply this manifest to ArgoCD (via UI or CLI) to enable GitOps deployment of your Helm chart and sealed secrets.
+
+---
+
 ## Notes
 - Update your `MONGO_URI` in the secret if you change MongoDB credentials or service name.
 - Check logs with `kubectl logs -l app=backend` or `kubectl logs -l app=mongodb` for troubleshooting.
