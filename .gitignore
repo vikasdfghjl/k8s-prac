@@ -1,0 +1,20 @@
+backend/node_modules
+backend/.env
+
+
+secrets.env
+.env
+
+# Helm and Kubernetes
+k8s-prac/charts/
+k8s-prac/templates/*.tpl
+k8s-prac/.helmignore
+k8s-prac/*.tgz
+
+# Kubernetes secrets and config
+k8s-secret.yaml
+*.secret.yaml
+*.config.yaml
+
+# Minikube and kubectl local files (if any)
+*.log

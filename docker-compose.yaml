@@ -1,0 +1,37 @@
+services:
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "5000:5000"
+    restart: always
+    networks:
+      - totodo-network
+    depends_on:
+      - mongodb
+    env_file:
+      - secrets.env 
+
+  mongodb:
+    image: mongo:8.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    restart: always
+    env_file:
+      - secrets.env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - totodo-network
+
+networks:
+  totodo-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
