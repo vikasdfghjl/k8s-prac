@@ -22,12 +22,24 @@ services:
     env_file:
       - secrets.env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_USERNAME=vikas
+      - MONGO_INITDB_ROOT_PASSWORD=singh123
     volumes:
       - mongo-data:/data/db
     networks:
       - totodo-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - totodo-network
+    depends_on:
+      - backend
 
 networks:
   totodo-network:
