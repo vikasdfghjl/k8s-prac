@@ -1,0 +1,59 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "k8s-prac.fullname" . }}-mongo-pvc
+  labels:
+    {{- include "k8s-prac.labels" . | nindent 4 }}
+    component: mongodb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mongodb.persistence.size }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "k8s-prac.fullname" . }}-mongodb
+  labels:
+    {{- include "k8s-prac.labels" . | nindent 4 }}
+    component: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "k8s-prac.selectorLabels" . | nindent 6 }}
+      component: mongodb
+  template:
+    metadata:
+      labels:
+        {{- include "k8s-prac.labels" . | nindent 8 }}
+        component: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          imagePullPolicy: {{ .Values.mongodb.image.pullPolicy }}
+          ports:
+            - name: mongodb
+              containerPort: 27017
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: {{ .Values.mongodb.auth.rootUsername | quote }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: {{ .Values.mongodb.auth.rootPassword | quote }}
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+          {{- with .Values.mongodb.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: {{ include "k8s-prac.fullname" . }}-mongo-pvc
+{{- end }}

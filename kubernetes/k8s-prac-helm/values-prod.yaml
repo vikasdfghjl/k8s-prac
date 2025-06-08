@@ -1,0 +1,92 @@
+# Production environment values
+# Override the default values for production
+
+replicaCount: 3
+
+image:
+  repository: vikasdfghjl/k8s-prac
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5000
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+mongodb:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  persistence:
+    size: 10Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: api.k8s-prac.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: k8s-prac-tls
+      hosts:
+        - api.k8s-prac.com
+
+# Production secrets should use external secret management
+secrets:
+  enabled: false  # Use external secret management in production
+
+configMap:
+  enabled: true
+  data:
+    NODE_ENV: "production"
+    LOG_LEVEL: "warn"
+    APP_NAME: "k8s-prac"
+
+# Production security context
+podSecurityContext:
+  fsGroup: 2000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Production node selector for dedicated nodes
+nodeSelector:
+  node-type: "application"
+
+# Production tolerations
+tolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "application"
+    effect: "NoSchedule"

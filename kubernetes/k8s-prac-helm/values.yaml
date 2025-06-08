@@ -5,6 +5,22 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
+# Backend application configuration
+backend:
+  env:
+    - name: MONGO_URI
+      valueFrom:
+        secretKeyRef:
+          name: "backend-secrets"
+          key: MONGO_URI
+    - name: JWT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: "backend-secrets"
+          key: JWT_SECRET
+    - name: PORT
+      value: "5000"
+
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: vikasdfghjl/k8s-prac
@@ -124,3 +140,37 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# MongoDB configuration
+mongodb:
+  enabled: true
+  image:
+    repository: mongo
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+  auth:
+    rootUsername: vikas
+    rootPassword: singh123
+  persistence:
+    size: 1Gi
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+
+# Secrets configuration
+secrets:
+  enabled: true
+  data:
+    MONGO_URI: "mongodb://vikas:singh123@RELEASE_NAME-mongodb:27017/totodo?authSource=admin"
+    JWT_SECRET: "abcdefg1234567"
+
+# ConfigMap configuration
+configMap:
+  enabled: false
+  data: {}
+    # APP_NAME: "k8s-prac"
+    # LOG_LEVEL: "info"

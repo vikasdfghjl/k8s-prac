@@ -1,0 +1,73 @@
+# Staging environment values
+# Override the default values for staging
+
+replicaCount: 2
+
+image:
+  repository: vikasdfghjl/k8s-prac
+  tag: "staging"
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 5000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+mongodb:
+  enabled: true
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  persistence:
+    size: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rate-limit: "50"
+  hosts:
+    - host: staging-api.k8s-prac.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+secrets:
+  enabled: true
+  data:
+    MONGO_URI: "mongodb://vikas:singh123@RELEASE_NAME-mongodb:27017/totodo-staging?authSource=admin"
+    JWT_SECRET: "staging-secret-key-67890"
+
+configMap:
+  enabled: true
+  data:
+    NODE_ENV: "staging"
+    LOG_LEVEL: "info"
+    APP_NAME: "k8s-prac-staging"
+
+# Basic security for staging
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000

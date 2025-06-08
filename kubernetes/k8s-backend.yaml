@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: vikasdfghjl/k8s-prac:latest # Use 'backend:latest' if using Minikube's Docker, or replace with your registry/image
+          image: vikasdfghjl/k8s-prac:latest
           ports:
             - containerPort: 5000
           env:

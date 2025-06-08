@@ -1,13 +1,4 @@
-🎉 {{ .Chart.Name }} has been deployed successfully!
-
-📊 Deployment Summary:
-  - Release: {{ .Release.Name }}
-  - Namespace: {{ .Release.Namespace }}
-  - Chart Version: {{ .Chart.Version }}
-  - App Version: {{ .Chart.AppVersion }}
-  - Replicas: {{ .Values.replicaCount }}
-
-🌐 Access your application:
+1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}
   {{- range .paths }}
@@ -20,7 +11,7 @@
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "k8s-prac.fullname" . }}'
+           You can watch its status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "k8s-prac.fullname" . }}'
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "k8s-prac.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .Values.service.port }}
 {{- else if contains "ClusterIP" .Values.service.type }}
@@ -29,40 +20,3 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
-
-📋 Useful Commands:
-  # View pods
-  kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }}
-
-  # View logs
-  kubectl logs -l app.kubernetes.io/instance={{ .Release.Name }} -f
-
-  # View services
-  kubectl get svc -l app.kubernetes.io/instance={{ .Release.Name }}
-
-{{- if .Values.mongodb.enabled }}
-  # Connect to MongoDB
-  kubectl exec -it deployment/{{ include "k8s-prac.fullname" . }}-mongodb -- mongosh --username {{ .Values.mongodb.auth.rootUsername }}
-{{- end }}
-
-🔄 Upgrade/Rollback:
-  # Upgrade
-  helm upgrade {{ .Release.Name }} {{ .Chart.Name }}
-
-  # Rollback
-  helm rollback {{ .Release.Name }}
-
-  # View history
-  helm history {{ .Release.Name }}
-
-🗑️  Uninstall:
-  helm uninstall {{ .Release.Name }}
-
-{{- if .Values.autoscaling.enabled }}
-🚀 Auto-scaling is enabled:
-  - Min replicas: {{ .Values.autoscaling.minReplicas }}
-  - Max replicas: {{ .Values.autoscaling.maxReplicas }}
-  - CPU target: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}%
-{{- end }}
-
-For more information about this chart, visit: https://github.com/your-org/k8s-prac

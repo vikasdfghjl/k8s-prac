@@ -1,0 +1,53 @@
+# Development environment values
+# Override the default values for development
+
+replicaCount: 1
+
+image:
+  repository: vikasdfghjl/k8s-prac
+  tag: "dev"
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 5000
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+mongodb:
+  enabled: true
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  persistence:
+    size: 500Mi
+
+autoscaling:
+  enabled: false
+
+ingress:
+  enabled: false
+
+# Development-specific secrets (base64 encoded in real scenarios)
+secrets:
+  enabled: true
+  data:
+    MONGO_URI: "mongodb://vikas:singh123@RELEASE_NAME-mongodb:27017/totodo-dev?authSource=admin"
+    JWT_SECRET: "dev-secret-key-12345"
+
+configMap:
+  enabled: true
+  data:
+    NODE_ENV: "development"
+    LOG_LEVEL: "debug"
+    APP_NAME: "k8s-prac-dev"
